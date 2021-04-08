@@ -1,11 +1,9 @@
 {
-    "name": "Abrusle.UnityCoroutween.Editor",
+    "name": "Abrusle.UnityCoroutween.Examples",
     "references": [
         "GUID:c3f09121e8a789d4dbbabd0d4322d98a"
     ],
-    "includePlatforms": [
-        "Editor"
-    ],
+    "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
     "overrideReferences": false,

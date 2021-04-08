@@ -1,10 +1,24 @@
 ﻿using System;
 
-public interface ITween
+namespace Abrusle.CorouTween
 {
-    event Action AnimationComplete;
-    
-    void Play(float duration, CorouTween.UpdateAnimationDelegate update = null);
+    public interface ITween
+    {
+        /// <summary>
+        /// Event invoked when the animation finishes playing.
+        /// </summary>
+        event Action AnimationComplete;
 
-    void Stop();
+        /// <summary>
+        /// Plays an animation.
+        /// </summary>
+        /// <param name="duration"></param>
+        /// <param name="update"></param>
+        void Play(float duration, TweeningUtility.UpdateAnimationDelegate update = null);
+
+        /// <summary>
+        /// Stops an animation
+        /// </summary>
+        void Stop();
+    }
 }

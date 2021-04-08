@@ -1,53 +1,70 @@
 ﻿using System;
 using UnityEngine;
-using static CorouTween;
 
-public class Tween : ITween
+namespace Abrusle.CorouTween
 {
-    public event Action AnimationComplete;
+    using static TweeningUtility;
 
-    private UpdateAnimationDelegate UpdateDelegate
+    public class Tween
     {
-        get => _update;
-        set
+        /// <summary>
+        /// Event invoked when the animation finishes playing.
+        /// </summary>
+        public event Action AnimationComplete;
+
+        /// <summary>
+        /// True when the Tween is playing.
+        /// </summary>
+        public bool IsPlaying => _coroutine != null && _hostBehaviour != null;
+
+        private Coroutine _coroutine;
+        private Action _onComplete;
+
+        private readonly UpdateAnimationDelegate _update;
+        private readonly MonoBehaviour _hostBehaviour;
+        private readonly float _duration;
+
+        public Tween(MonoBehaviour hostBehaviour, UpdateAnimationDelegate update, float duration)
         {
-            if (value == _update) return;
-            KillTween();
-            _update = value;
+            _hostBehaviour = hostBehaviour;
+            _update = update;
+            _duration = duration;
         }
-    }
-    
-    private Coroutine _coroutine;
-    private UpdateAnimationDelegate _update;
-    
-    private readonly MonoBehaviour _targetBehaviour;
 
-    public Tween(MonoBehaviour targetBehaviour, UpdateAnimationDelegate update = null)
-    {
-        _targetBehaviour = targetBehaviour;
-        _update = update;
-    }
+        /// <summary>
+        /// Plays an animation.
+        /// </summary>
+        /// <param name="durationOverride"></param>
+        /// <param name="onComplete"></param>
+        public void Play(float? durationOverride = null, Action onComplete = null)
+        {
+            KillTween();
+            _onComplete = onComplete;
+            _coroutine = _hostBehaviour.StartTween(durationOverride ?? _duration, _update, OnComplete);
+        }
 
-    public void Play(float duration, UpdateAnimationDelegate update = null)
-    {
-        KillTween();
-        
-        _coroutine = _targetBehaviour.StartTween(duration, update ?? _update, OnComplete);
-    }
+        /// <summary>
+        /// Stops an animation
+        /// </summary>
+        public void Stop()
+        {
+            KillTween();
+        }
 
-    public void Stop()
-    {
-        KillTween();
-    }
+        private void KillTween()
+        {
+            if (_coroutine != null)
+            {
+                _hostBehaviour.StopCoroutine(_coroutine);
+                _coroutine = null;
+            }
+        }
 
-    private void KillTween()
-    {
-        if (_coroutine != null)
-            _targetBehaviour.StopCoroutine(_coroutine);
-    }
-
-    private void OnComplete()
-    {
-        AnimationComplete?.Invoke();
+        private void OnComplete()
+        {
+            _coroutine = null;
+            _onComplete?.Invoke();
+            AnimationComplete?.Invoke();
+        }
     }
 }
